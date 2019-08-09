@@ -16,7 +16,7 @@ These programs can be executed in [[http://jupyter.org][Jupyter]] notebooks on [
   - https://mybinder.org/v2/gh/tamura70/taocp-sat-py/master?urlpath=lab/tree/notebooks/index.ipynb (in Japanese)
 
 If you want to run this on [[https://colab.research.google.com][Google Colaboratory]], use the following link.
-  - https://colab.research.google.com/github/tamura70/taocp-sat-py/notebooks/index.ipynb (in Japanese)
+  - https://colab.research.google.com/github/tamura70/taocp-sat-py/blob/master/notebooks/index.ipynb (in Japanese)
 
 See the following web page for more details of how to run Knuth's programs.
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]] (in Japanese)
