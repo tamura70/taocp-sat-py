@@ -1,12 +1,15 @@
 #!/bin/bash
 cd /content
-mkdir -p /opt/bin
+rm -r taocpsat-*.zip knuth prog
 wget http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/taocpsat-knuth-linux64-bin.zip
 unzip taocpsat-knuth-linux64-bin.zip
-mv knuth/bin/* /opt/bin/
-chmod +x /opt/bin/*
 wget http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/taocpsat-prog.zip
 unzip taocpsat-prog.zip
+
+mkdir -p /opt/bin
+mv knuth/bin/* /opt/bin/
+chmod +x /opt/bin/*
+
 apt --yes install openjdk-8-jre-headless
 apt --yes install scala 
 cd prog
