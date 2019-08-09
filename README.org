@@ -1,0 +1,27 @@
+#+TITLE: TAOCP Satisfiability
+#+AUTHOR: Naoyuki Tamura
+* Introduction
+# #+HTML: <a href="https://mybinder.org/v2/gh/tamura70/taocp-sat-py3/master?urlpath=lab/tree/notebooks/index.ipynb"><img src="https://mybinder.org/badge_logo.svg"/></a>
+
+[[https://github.com/tamura70/taocp-sat-py3/][This repository]] provides Linux binaries and PDF files produced from the CWEB programs written by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]] for "Satisfiability", Volume 4 Fascicle 6 of [[https://www-cs-faculty.stanford.edu/~knuth/taocp.html][The Art of Computer Programming]] (TAOCP).  The original CWEB programs were obtained on March 19, 2019 from:
+  - [[https://www-cs-faculty.stanford.edu/~knuth/programs.html]]
+
+They were compiled on Ubuntu 18.04 with TeX Live 2018 by using the following Perl script.
+  - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/knuth/install.pl]]
+
+There were some errors during the compilation (see the following log file).  Therefore, it is not guaranteed the compiled programs and PDFs are correct.
+  - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/knuth/install.log]]
+
+These programs can be executed in [[http://jupyter.org][Jupyter]] notebooks on [[https://mybinder.org][Binder]] with iPython3 kernel.
+  - https://mybinder.org/v2/gh/tamura70/taocp-sat-py3/master?urlpath=lab/tree/notebooks/index.ipynb (in Japanese)
+
+If you want to run this on [[https://colab.research.google.com][Google Colaboratory]], use the following link.
+  - https://colab.research.google.com/github/tamura70/taocp-sat-py3/notebooks/index.ipynb (in Japanese)
+
+See the following web page for more details of how to run Knuth's programs.
+  - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]] (in Japanese)
+
+* Credits/Links
+
+  - [[http://jupyter.org][Jupyter]]
+  - [[https://mybinder.org][Binder]]

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# install bash
+python -m bash_kernel.install
+
+# move binaries
+mv $HOME/bin $HOME/.local
+chmod +x $HOME/.local/bin/*
+
+# compile scala programs
+cd prog
+mkdir target
+scalac -d target/taocpsat-1.0.jar src/main/scala/*.scala
+
+exit 0

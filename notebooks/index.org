@@ -1,0 +1,97 @@
+#+TITLE: Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む
+#+AUTHOR: 田村直之
+
+* はじめに
+Donald E. Knuth 先生の名著 [[https://www-cs-faculty.stanford.edu/~knuth/taocp.html][The Art of Computer Programming]] (TAOCP)の
+第4巻 Combinatorial Algorithms 中の 7.2.2.2 節 Satisfiability のプログラム等を提供している．
+プログラムは [[https://mybinder.org][Binder]] あるいは [[https://colab.research.google.com][Google Colaboratory]] 上の [[http://jupyter.org][Jupyter]] ノートブックで実行可能である．
+
+内容の補足については，以下を参照．
+
+  - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]]
+
+** Binder上で実行する場合の注意
+
+- アカウントは不要．
+- プログラムはすでにインストールされている．
+- 10分程度操作をしないとセッションが停止する．
+- セッションが停止すると自分が編集した内容は失われる．
+  - 必要ならノートブック名を右クリックして自分のPCにDownloadしておく．
+
+** Google Colab上で実行する場合の注意
+
+- Googleアカウントが必要．
+- プログラムのインストール作業が必要．
+- 30分程度操作をしないとセッションが停止する．
+- ノートブックをGoogle Driveに保存することが可能．
+
+* ノートブック
+
+  - [[file:01A-a_simple_example.ipynb][簡単な例 (A simple example)]]
+  - [[file:01B-exact_covering.ipynb][厳密被覆 (Exact covering)]]
+  - [[file:01C-coloring_a_graph.ipynb][グラフ彩色 (Coloring a graph)]]
+
+* プログラム
+** Knuth版プログラム
+Knuth作のSATソルバーや関連するプログラムは以下から入手可能である．
+  - [[https://www-cs-faculty.stanford.edu/~knuth/programs.html]]
+
+ここでは，以下のWebページのようにコンパイルし， =.local/bin/= にインストールしている．
+  - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/install-knuth.html][Knuth版SATソルバーのインストール]]
+
+** Knuth版プログラムの利用方法
+
+Google Colab上の場合は以下を実行する (新しいセッションのたびに必要)．
+
+#+BEGIN_SRC ipython
+#+END_SRC
+
+まず prog のフォルダに移動する．
+
+#+BEGIN_SRC ipython
+cd ~/prog
+#+END_SRC
+
+教科書4ページの式(6) [[../prog/rivest-sat.sat][rivest-sat.sat]] に対してKnuth作のSATソルバー sat13 を実行してみる．
+#+BEGIN_SRC ipython
+! sat13 < rivest-unsat.sat
+#+END_SRC
+
+以下のような出力結果が得られるはずだ．
+#+BEGIN_EXAMPLE
+(4 variables, 8 clauses, 24 literals successfully read)
+UNSAT
+Altogether 301+670 mems, 5804 bytes, 3 nodes, 3 clauses learned (ave 1.3->1.3), 60 memcells.
+(2 clauses were subsumed on-the-fly.)
+(1 restart.)
+~
+#+END_EXAMPLE
+
+  - 充足不能を表す "=~=" の行は標準出力に，その他はピンク色の背景の標準エラーに出力されている．
+    標準出力と標準エラー出力の順序は前後することがある．
+  - 出力中の最初の行は，入力中の変数の個数，節の個数，リテラルの個数を表している．
+  - "=301+670 mems=" は，メモリーアクセス回数を表す．
+    =301= が前処理でのアクセス数， =670= が解探索でのアクセス数である．
+  - "=5804 bytes=" は，メモリー使用量を表す．
+  - "=3 nodes=" は，解探索で暗黙的に作成された探索木のノード数を表す．
+  - "=3 clauses learned=" は，学習節の個数を表す．
+  - その他については，sat13.pdf中の説明や教科書中の説明を参照すること．
+
+次に，教科書4ページの式(7) [[../prog/rivest-sat.sat][rivest-sat.sat]] に対しても同様に実行してみる．
+#+BEGIN_SRC ipython
+! sat13 < rivest-sat.sat
+#+END_SRC
+
+  - 解の値割当てを表す "=3 ~1 2 4=" 以外の行は，標準エラーに出力されている．
+
+各プログラムの詳細は，それぞれのPDFファイルを参照すること．
+例えば [[../knuth/pdf/sat13.pdf][sat13.pdf]] には以下の説明がある．
+  - 1ページ: 入力の形式
+    + 変数名はASCIIコードで "=!=" から "=}=" の間 (つまり16進で22から7Cまで)の8文字以内の文字列で，
+      "=~=" から始まらないもの
+    + 変数名の直前に "=~=" を付けると否定を表す
+    + "@<tt>~ @</tt>" から始まる行はコメント
+  - 3ページ: オプションの説明
+    + [[../knuth/sat-examples/README][knuth/sat-examples/README]] によれば，Knuthは以下のオプション指定を用いている．
+      : $ sat13 h14 b10000 T50000000000 <file.sat
+

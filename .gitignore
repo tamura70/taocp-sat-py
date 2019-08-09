@@ -1,0 +1,9 @@
+*.class
+*.log
+.ipynb_checkpoints
+/.idea
+.DS_Store
+/tmp
+prog/target
+prog/project
+prog/.idea
