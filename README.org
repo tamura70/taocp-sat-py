@@ -13,10 +13,10 @@ There were some errors during the compilation (see the following log file).  The
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/knuth/install.log]]
 
 These programs can be executed in [[http://jupyter.org][Jupyter]] notebooks on [[https://mybinder.org][Binder]] with iPython3 kernel.
-  - https://mybinder.org/v2/gh/tamura70/taocp-sat-py3/master?urlpath=lab/tree/notebooks/index.ipynb (in Japanese)
+  - https://mybinder.org/v2/gh/tamura70/taocp-sat-py/master?urlpath=lab/tree/notebooks/index.ipynb (in Japanese)
 
 If you want to run this on [[https://colab.research.google.com][Google Colaboratory]], use the following link.
-  - https://colab.research.google.com/github/tamura70/taocp-sat-py3/notebooks/index.ipynb (in Japanese)
+  - https://colab.research.google.com/github/tamura70/taocp-sat-py/notebooks/index.ipynb (in Japanese)
 
 See the following web page for more details of how to run Knuth's programs.
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]] (in Japanese)
