@@ -44,11 +44,12 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 Google Colab上の場合は以下を実行する (新しいセッションのたびに必要)．
 
 #+BEGIN_SRC ipython
-env HOME=/content
-cd ~
-! rm setup.sh*
-! wget https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
-! sh setup.sh
+%%bash
+export HOME=/content
+cd $HOME
+rm setup.sh*
+wget https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
+sh setup.sh
 #+END_SRC
 
 まず prog のフォルダに移動する．
