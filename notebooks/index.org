@@ -10,12 +10,6 @@ Donald E. Knuth 先生の名著 [[https://www-cs-faculty.stanford.edu/~knuth/tao
 
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]]
 
-* ノートブック
-
-  - [[file:01A-a_simple_example.ipynb][簡単な例 (A simple example)]]
-  - [[file:01B-exact_covering.ipynb][厳密被覆 (Exact covering)]]
-  - [[file:01C-coloring_a_graph.ipynb][グラフ彩色 (Coloring a graph)]]
-
 * プログラム
 
 Knuth作のSATソルバーや関連するプログラムは以下から入手可能である．
@@ -32,6 +26,12 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 - セッションが停止すると自分が編集した内容は失われる．
   - 必要ならノートブック名を右クリックして自分のPCにDownloadしておく．
 
+新しいセッションを開始するときは必ず以下を実行し prog フォルダに移動する．
+
+#+BEGIN_SRC ipython
+cd ~/prog
+#+END_SRC
+
 ** Google Colab上で実行する場合の注意点
 
 - Googleアカウントが必要．
@@ -39,24 +39,23 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 - 30分程度操作をしないとセッションが停止する．
 - ノートブックをGoogle Driveに保存することが可能．
 
-** プログラムの利用方法
-
-Google Colab上の場合は以下を実行する (新しいセッションのたびに必要)．
+新しいセッションを開始するときは必ず以下を実行しプログラムをインストールする．
 
 #+BEGIN_SRC ipython
 %%bash
-export HOME=/content
-cd $HOME
+cd /content
 rm setup.sh*
 wget https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
 sh setup.sh
 #+END_SRC
 
-まず prog のフォルダに移動する．
+また以下を実行し prog フォルダに移動する．
 
 #+BEGIN_SRC ipython
-cd ~/prog
+cd /content/prog
 #+END_SRC
+
+* 充足可能性
 
 教科書4ページの式(6) [[../prog/rivest-sat.sat][rivest-sat.sat]] に対してKnuth作のSATソルバー sat13 を実行してみる．
 #+BEGIN_SRC ipython
@@ -104,6 +103,72 @@ Altogether 301+670 mems, 5804 bytes, 3 nodes, 3 clauses learned (ave 1.3->1.3), 
 Scala版のプログラムを利用する場合は以下のようになる．
 #+BEGIN_SRC ipython
 ! ./taocpsat SolverA < rivest-sat.sat
+#+END_SRC
+
+
+* 簡単な例 (A simple example)
+
+$\textit{waerden}(3,3;9)$ が充足不能 (unsat)であることを，
+入力ファイル [[../prog/waerden-3-3-9.sat][waerden-3-3-9.sat]] を用いて確かめる．
+#+BEGIN_SRC ipython
+! sat13 < waerden-3-3-9.sat
+#+END_SRC
+
+$\textit{waerden}(j,k;n)$ のCNF式を出力するプログラムは [[../knuth/pdf/sat-waerden.pdf][sat-waerden]] である．
+#+BEGIN_SRC ipython
+! sat-waerden 3 3 8
+#+END_SRC
+
+bashのパイプ (~|~)を用いて，以下のようにすれば sat13 の入力として与えることができる．
+#+BEGIN_SRC ipython
+! sat-waerden 3 3 8 | sat13
+#+END_SRC
+
+Scala版のプログラムを利用する場合は以下のようになる．
+#+BEGIN_SRC ipython
+! ./taocpsat waerden 3 3 8 | sat13
+#+END_SRC
+
+* 厳密被覆 (Exact covering)
+
+$\textit{langford}(n)$ の厳密被覆問題を出力するプログラムは [[../knuth/pdf/langford.pdf][langford]] である．
+#+BEGIN_SRC ipython
+! langford 3
+#+END_SRC
+
+これをCNF式に変換して sat13 の入力として与えるには以下のようにする．
+#+BEGIN_SRC ipython
+! langford 3 | sat-dance | sat13
+#+END_SRC
+
+結果から2, 7, 8のオプション，すなわち"d1 s2 s4", "d2 s3 s6", "d3 s1 s5"が選ばれていることがわかる．
+これから解 "312132" が得られる．
+
+$\textit{langford}'(n)$ の場合は以下のように実行する．
+#+BEGIN_SRC ipython
+! langford 3 | sat-dance-heule | sat13
+#+END_SRC
+
+* グラフ彩色 (Coloring a graph)
+
+10次のMcGregorグラフを4彩色するには以下のようにする．
+#+BEGIN_SRC ipython
+! mcgregor-graph 10
+! sat-color mcgregor10.gb 4 | sat13
+#+END_SRC
+
+結果を取り出すには以下のようにすれば良い．
+#+BEGIN_SRC ipython
+! mcgregor-graph 10
+! sat-color mcgregor10.gb 4 | sat13 | tr " " "\n" | grep -v '^~' | sort -n
+#+END_SRC
+
+10次のMcGregorグラフの4彩色で色1が7回以下の彩色を求める．
+#+BEGIN_SRC ipython
+! mcgregor-graph 10
+! sat-color mcgregor10.gb 4 > /tmp/mcg10.sat
+! sat-threshold-sinz-graphs 110 7 mcgregor10.gb 1 > /tmp/mcg10le7.sat
+! cat /tmp/mcg10.sat /tmp/mcg10le7.sat | sat13 | tr " " "\n" | grep -v '^[~S]' | grep '\.1$'
 #+END_SRC
 
 
