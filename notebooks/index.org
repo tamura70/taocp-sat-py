@@ -10,21 +10,6 @@ Donald E. Knuth 先生の名著 [[https://www-cs-faculty.stanford.edu/~knuth/tao
 
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]]
 
-** Binder上で実行する場合の注意
-
-- アカウントは不要．
-- プログラムはすでにインストールされている．
-- 10分程度操作をしないとセッションが停止する．
-- セッションが停止すると自分が編集した内容は失われる．
-  - 必要ならノートブック名を右クリックして自分のPCにDownloadしておく．
-
-** Google Colab上で実行する場合の注意
-
-- Googleアカウントが必要．
-- プログラムのインストール作業が必要．
-- 30分程度操作をしないとセッションが停止する．
-- ノートブックをGoogle Driveに保存することが可能．
-
 * ノートブック
 
   - [[file:01A-a_simple_example.ipynb][簡単な例 (A simple example)]]
@@ -32,18 +17,38 @@ Donald E. Knuth 先生の名著 [[https://www-cs-faculty.stanford.edu/~knuth/tao
   - [[file:01C-coloring_a_graph.ipynb][グラフ彩色 (Coloring a graph)]]
 
 * プログラム
-** Knuth版プログラム
+
 Knuth作のSATソルバーや関連するプログラムは以下から入手可能である．
   - [[https://www-cs-faculty.stanford.edu/~knuth/programs.html]]
 
-ここでは，以下のWebページのようにコンパイルし， =.local/bin/= にインストールしている．
+ここでは，以下のWebページの方法でコンパイルしている．
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/install-knuth.html][Knuth版SATソルバーのインストール]]
 
-** Knuth版プログラムの利用方法
+** Binder上で実行する場合の注意点
+
+- アカウントは不要．
+- プログラムはすでにインストールされている．
+- 10分程度操作をしないとセッションが停止する．
+- セッションが停止すると自分が編集した内容は失われる．
+  - 必要ならノートブック名を右クリックして自分のPCにDownloadしておく．
+
+** Google Colab上で実行する場合の注意点
+
+- Googleアカウントが必要．
+- プログラムのインストール作業が必要．
+- 30分程度操作をしないとセッションが停止する．
+- ノートブックをGoogle Driveに保存することが可能．
+
+** プログラムの利用方法
 
 Google Colab上の場合は以下を実行する (新しいセッションのたびに必要)．
 
 #+BEGIN_SRC ipython
+env HOME=/content
+cd ~
+! rm setup.sh*
+! wget https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
+! sh setup.sh
 #+END_SRC
 
 まず prog のフォルダに移動する．
@@ -94,4 +99,10 @@ Altogether 301+670 mems, 5804 bytes, 3 nodes, 3 clauses learned (ave 1.3->1.3), 
   - 3ページ: オプションの説明
     + [[../knuth/sat-examples/README][knuth/sat-examples/README]] によれば，Knuthは以下のオプション指定を用いている．
       : $ sat13 h14 b10000 T50000000000 <file.sat
+
+Scala版のプログラムを利用する場合は以下のようになる．
+#+BEGIN_SRC ipython
+! ./taocpsat SolverA < rivest-sat.sat
+#+END_SRC
+
 
