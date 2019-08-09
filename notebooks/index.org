@@ -44,8 +44,7 @@ cd ~/prog
 #+BEGIN_SRC ipython
 %%bash
 cd /content
-rm setup.sh*
-wget https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
+wget -nc https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
 sh setup.sh
 #+END_SRC
 
@@ -104,7 +103,6 @@ Scala版のプログラムを利用する場合は以下のようになる．
 #+BEGIN_SRC ipython
 ! ./taocpsat SolverA < rivest-sat.sat
 #+END_SRC
-
 
 * 簡単な例 (A simple example)
 
