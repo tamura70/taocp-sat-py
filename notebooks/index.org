@@ -126,9 +126,35 @@ bashのパイプ (~|~)を用いて，以下のようにすれば sat13 の入力
 ! sat-waerden 3 3 8 | sat13
 #+END_SRC
 
+#+RESULTS:
+:results:
+# Out [2]: 
+# output
+(8 variables, 24 clauses, 72 literals successfully read)
+!SAT!
+ 6 ~5 ~4 3 ~2 8 ~7 1
+Altogether 561+666 mems, 6660 bytes, 5 nodes, 1 clauses learned (ave 3.0->3.0), 157 memcells.
+(1 restart.)
+
+:end:
+
 Scala版のプログラムを利用する場合は以下のようになる．
 #+BEGIN_SRC ipython :session
 ! ./taocpsat waerden 3 3 8 | sat13
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+# k,j,n を定義
+(k,j,n) = (3,3,8)
+# SATソルバーを実行しその結果を変数 result に代入する．標準エラー出力は別のファイルに保存してから表示している．
+result = ! sat-waerden $k $j $n | sat13 2>/tmp/err
+! cat /tmp/err
+# result の最初の行を空白区切りで分割して"~"のついていないものだけ取り出し，変数 model に代入する．
+model = [ lit for lit in result[0].strip().split(" ") if not lit.startswith("~") ]
+# model をソートする．
+model.sort()
+# model を表示する．
+model
 #+END_SRC
 
 * 厳密被覆 (Exact covering)
