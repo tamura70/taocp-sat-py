@@ -10,8 +10,6 @@ Donald E. Knuth 先生の名著 [[https://www-cs-faculty.stanford.edu/~knuth/tao
 
   - [[http://bach.istc.kobe-u.ac.jp/lect/taocp-sat/][Knuth先生の『TAOCP 7.2.2.2 Satisfiability』を読む]]
 
-* プログラム
-
 Knuth作のSATソルバーや関連するプログラムは以下から入手可能である．
   - [[https://www-cs-faculty.stanford.edu/~knuth/programs.html]]
 
@@ -43,7 +41,7 @@ cd ~/prog
 - ノートブックをGoogle Driveに保存することが可能．
   - まず最初に「ドライブにコピー」を実行するのがよい．
 
-新しいセッションを開始するときは必ず以下を実行してプログラムをインストールし， prog フォルダに移動しておく．
+新しいセッションを開始するときは必ず以下を実行してプログラムをインストールする．
 
 #+BEGIN_SRC ipython :session
 %%bash
@@ -51,6 +49,11 @@ cd /content
 wget -nc https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
 sh setup.sh
 cd prog
+#+END_SRC
+
+また，必ず以下を実行し prog フォルダに移動する．
+#+BEGIN_SRC ipython :session
+cd /content/prog
 #+END_SRC
 
 * 充足可能性
@@ -236,6 +239,8 @@ $\textit{langford}'(n)$ の場合は以下のように実行する．
 #+BEGIN_SRC ipython :session
 ! ./taocpsat dadda factor_fifo 15 15 111111110111100000001110100011 | ./taocpsat bchain encode | sat13 | ./taocpsat decode log X Y Z
 #+END_SRC
+
+* 故障検査 (Fault testing)
 
 #+BEGIN_SRC ipython :session
 zs = [
