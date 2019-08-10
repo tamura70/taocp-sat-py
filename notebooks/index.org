@@ -30,7 +30,7 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 新しいセッションを開始するときは必ず以下を実行し prog フォルダに移動する．
 
 #+BEGIN_SRC ipython :session
-cd ../prog
+cd ~/prog
 #+END_SRC
 
 ** Google Colab上で実行する場合の注意点
@@ -43,19 +43,14 @@ cd ../prog
 - ノートブックをGoogle Driveに保存することが可能．
   - まず最初に「ドライブにコピー」を実行するのがよい．
 
-新しいセッションを開始するときは必ず以下を実行しプログラムをインストールする．
+新しいセッションを開始するときは必ず以下を実行してプログラムをインストールし， prog フォルダに移動しておく．
 
 #+BEGIN_SRC ipython :session
 %%bash
 cd /content
 wget -nc https://raw.githubusercontent.com/tamura70/taocp-sat-py/master/colab/setup.sh
 sh setup.sh
-#+END_SRC
-
-また，以下を実行し prog フォルダに移動する．
-
-#+BEGIN_SRC ipython :session
-cd ../prog
+cd prog
 #+END_SRC
 
 * 充足可能性
@@ -126,36 +121,53 @@ bashのパイプ (~|~)を用いて，以下のようにすれば sat13 の入力
 ! sat-waerden 3 3 8 | sat13
 #+END_SRC
 
-#+RESULTS:
-:results:
-# Out [2]: 
-# output
-(8 variables, 24 clauses, 72 literals successfully read)
-!SAT!
- 6 ~5 ~4 3 ~2 8 ~7 1
-Altogether 561+666 mems, 6660 bytes, 5 nodes, 1 clauses learned (ave 3.0->3.0), 157 memcells.
-(1 restart.)
-
-:end:
-
 Scala版のプログラムを利用する場合は以下のようになる．
 #+BEGIN_SRC ipython :session
 ! ./taocpsat waerden 3 3 8 | sat13
 #+END_SRC
 
+$(j,k,n)=(4,4,34)$ の解を探してみる．
+#+BEGIN_SRC ipython :session
+(j,k,n) = (4,4,34)
+! sat-waerden $j $k $n | sat13
+#+END_SRC
+
+SATソルバーの結果からは，すぐにはどのような解が得られたのかがわからない．
+Linuxのコマンドと組み合わせるなら以下のようにできる．
 #+BEGIN_SRC ipython :session
 # k,j,n を定義
-(k,j,n) = (3,3,8)
+(j,k,n) = (4,4,34)
+! sat-waerden $j $k $n | sat13 | tr ' ' '\n' | grep -v '^~' | sort -n
+#+END_SRC
+
+Pythonのプログラムと組み合わせるなら以下のようにできる．
+#+BEGIN_SRC ipython :session
+(j,k,n) = (4,4,34)
 # SATソルバーを実行しその結果を変数 result に代入する．標準エラー出力は別のファイルに保存してから表示している．
-result = ! sat-waerden $k $j $n | sat13 2>/tmp/err
+result = ! sat-waerden $j $k $n | sat13 2>/tmp/err
 ! cat /tmp/err
 # result の最初の行を空白区切りで分割して"~"のついていないものだけ取り出し，変数 model に代入する．
 model = [ lit for lit in result[0].strip().split(" ") if not lit.startswith("~") ]
-# model をソートする．
-model.sort()
-# model を表示する．
-model
+# 整数のリストに変換しソートして表示する
+nums = [ int(x) for x in model ]
+nums.sort()
+nums
 #+END_SRC
+
+#+RESULTS:
+:results:
+# Out [40]: 
+# output
+(34 variables, 352 clauses, 1408 literals successfully read)
+!SAT!
+Altogether 4857+141856 mems, 21974 bytes, 132 nodes, 77 clauses learned (ave 7.5->6.7), 3225 memcells.
+(13 learned clauses were discarded.)
+(3 clauses were subsumed on-the-fly.)
+(25 restarts.)
+
+# text/plain
+: [2, 4, 5, 6, 10, 12, 13, 15, 16, 17, 21, 23, 24, 26, 27, 28, 32, 34]
+:end:
 
 * 厳密被覆 (Exact covering)
 
@@ -188,7 +200,7 @@ $\textit{langford}'(n)$ の場合は以下のように実行する．
 結果を取り出すには以下のようにすれば良い．
 #+BEGIN_SRC ipython :session
 ! mcgregor-graph 10
-! sat-color mcgregor10.gb 4 | sat13 | tr " " "\n" | grep -v '^~' | sort -n
+! sat-color mcgregor10.gb 4 | sat13 | tr ' ' '\n' | grep -v '^~' | sort -n
 #+END_SRC
 
 10次のMcGregorグラフの4彩色で色1が7回以下の彩色を求める．
@@ -196,7 +208,95 @@ $\textit{langford}'(n)$ の場合は以下のように実行する．
 ! mcgregor-graph 10
 ! sat-color mcgregor10.gb 4 > /tmp/mcg10.sat
 ! sat-threshold-sinz-graphs 110 7 mcgregor10.gb 1 > /tmp/mcg10le7.sat
-! cat /tmp/mcg10.sat /tmp/mcg10le7.sat | sat13 | tr " " "\n" | grep -v '^[~S]' | grep '\.1$'
+! cat /tmp/mcg10.sat /tmp/mcg10le7.sat | sat13 | tr ' ' '\n' | grep -v '^[~S]' | grep '\.1$'
 #+END_SRC
 
+* 整数の因数分解 (Factoring integers)
+
+#+BEGIN_SRC ipython :session
+! cat prod-2-3-21-bchain.txt
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! ./taocpsat bchain encode <prod-2-3-21-bchain.txt | sat13
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! sat-dadda 2 3 21 | sat13
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! sat-dadda 15 15 1071514531 | sat13
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! sat-dadda 15 15 1071514531 | sat13 | ./taocpsat decode log X Y Z
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! ./taocpsat dadda factor_fifo 15 15 111111110111100000001110100011 | ./taocpsat bchain encode | sat13 | ./taocpsat decode log X Y Z
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+zs = [
+  "00000000000000000000001010000000000000001000000000000000000000000000000000000000000000000000000000000",
+  "10101110111111111111110111001011111111111010111111111101011111111111111011111111111111111111111111111",
+  "01010000010101000100001000110001010100000000000101000010001101000000000000101000101000001000000000000",
+  "01010000010000000101000000010001000101000000000100010000000100010101000000000000000001000001010000100",
+  "10101111101010111010111111101110101010111111111011101111111011101011101111111111111110111110111011101"
+]
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+zs[1].count("0")
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+z1 = [ j for j in range(1,100) if any([ zs[i][0] != zs[i][j] for i in range(0, len(zs)) ]) ]
+len(z1)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+z2 = [ j for j in range(1,100) if all([ zs[i][0] == zs[i][j] for i in range(0, len(zs)) ]) ]
+z2
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! ./taocpsat stuck list_patterns Y3,Y2,Y1,X2,X1 Z5,Z4,Z3,Z2,Z1 <prod-2-3-wires-bchain.txt
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! ./taocpsat stuck covering Y3,Y2,Y1,X2,X1 Z5,Z4,Z3,Z2,Z1 <prod-2-3-wires-bchain.txt
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! ./taocpsat stuck min_covering Y3,Y2,Y1,X2,X1 Z5,Z4,Z3,Z2,Z1 5 <prod-2-3-wires-bchain.txt | sat13 | tr ' ' '\n' | egrep '^[0-9]'
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! sed -e "s/^q' = .*$/q' = 0/" <prod-2-3-wires-bchain-stuck.txt | ./taocpsat bchain encode | sat13 | ./taocpsat decode log X Y
+#+END_SRC
+
+* Boole関数の学習 (Learning a Boolean function)
+
+#+BEGIN_SRC ipython :session
+(n,m,p) = (20,4,16)
+! sat-synth-trunc-kluj $n $m {2*p} <table2.txt | sat13 | tr ' ' '\n' | grep -v '~' | grep '[-+]' | sort
+#+END_SRC
+
+* 有界モデル検査 (Bounded model checking)
+  
+#+BEGIN_SRC ipython :session
+! sat-life-grid 7 15 3 >/tmp/slg3.sat
+! sat-threshold-bb-life15 105 39 >/tmp/stb39.sat
+! cat ../knuth/sat-examples/sources/7x15life3.dat /tmp/slg3.sat /tmp/stb39.sat | sat13 h10 | sat-life-filter
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+! sat-life-grid 7 15 4 >/tmp/a.sat
+! ./taocpsat life pattern d <life-sat.txt >/tmp/b.sat
+! ./taocpsat life threshold_bb 7 15 38 a b c >/tmp/c.sat
+! cat /tmp/a.sat /tmp/b.sat /tmp/c.sat >/tmp/d.sat
+! sat13 h11 </tmp/d.sat | sat-life-filter
+#+END_SRC
 
