@@ -31,14 +31,6 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 cd ~/prog
 #+END_SRC
 
-#+RESULTS:
-:results:
-# Out [1]: 
-# output
-/home/tamura/prog
-
-:end:
-
 ** Google Colab上で実行する場合の注意点
 
 - Googleアカウントが必要．
