@@ -31,6 +31,14 @@ Knuth作のSATソルバーや関連するプログラムは以下から入手可
 cd ~/prog
 #+END_SRC
 
+#+RESULTS:
+:results:
+# Out [1]: 
+# output
+/home/tamura/prog
+
+:end:
+
 ** Google Colab上で実行する場合の注意点
 
 - Googleアカウントが必要．
@@ -157,20 +165,24 @@ nums.sort()
 nums
 #+END_SRC
 
-#+RESULTS:
-:results:
-# Out [40]: 
-# output
-(34 variables, 352 clauses, 1408 literals successfully read)
-!SAT!
-Altogether 4857+141856 mems, 21974 bytes, 132 nodes, 77 clauses learned (ave 7.5->6.7), 3225 memcells.
-(13 learned clauses were discarded.)
-(3 clauses were subsumed on-the-fly.)
-(25 restarts.)
+#+BEGIN_SRC ipython :session
+import sys
+def waerden(j, k, n, f=sys.stdout):
+  for d in range(1,n):
+    for i in range(1,n):
+      if i+(j-1)*d <= n:
+        print(" ".join([str(i+a*d) for a in range(0,j)]), file=f)
+  for d in range(1,n):
+    for i in range(1,n):
+      if i+(k-1)*d <= n:
+        print(" ".join(["~"+str(i+a*d) for a in range(0,k)]), file=f)
+#+END_SRC
 
-# text/plain
-: [2, 4, 5, 6, 10, 12, 13, 15, 16, 17, 21, 23, 24, 26, 27, 28, 32, 34]
-:end:
+#+BEGIN_SRC ipython :session
+with open("/tmp/w.sat", "w") as f:
+  waerden(3,3,8,f)
+! sat13 </tmp/w.sat
+#+END_SRC
 
 * 厳密被覆 (Exact covering)
 
@@ -303,5 +315,182 @@ z2
 ! ./taocpsat life threshold_bb 7 15 38 a b c >/tmp/c.sat
 ! cat /tmp/a.sat /tmp/b.sat /tmp/c.sat >/tmp/d.sat
 ! sat13 h11 </tmp/d.sat | sat-life-filter
+#+END_SRC
+
+* (補足) 数独
+
+#+BEGIN_SRC ipython :session
+def p(i, j, a):
+  return f"{i}.{j}.{a}"
+import sys
+
+def cell(i, j, f=sys.stdout):
+  # 式(4)
+  print(" ".join([ p(i,j,a) for a in range(1,9+1) ]), file=f)
+  # 式(5)
+  for a in range(1,9+1):
+    for b in range(a+1,9+1):
+      print(f"~{p(i,j,a)} ~{p(i,j,b)}", file=f)
+
+def not_equal(i, j, k, l, f=sys.stdout):
+  # 式(6)
+  for a in range(1,9+1):
+    print(f"~{p(i,j,a)} ~{p(k,l,a)}", file=f)
+
+def equal(i, j, a, f=sys.stdout):
+  print(p(i,j,a), file=f)
+
+def sudoku_solver(puzzle):
+  with open("/tmp/s.sat", "w") as f:
+    # 式(4)(5)
+    for i in range(0,9):
+      for j in range(0,9):
+        cell(i, j, f)
+    # 式(6)
+    for i in range(0,9):
+      for j in range(0,9):
+        for k in range(0,9):
+          for l in range(0,9):
+            if 9*i+j < 9*k+l:
+              if i==k or j==l or (i//3==k//3 and j//3==l//3):
+                not_equal(i, j, k, l, f)
+    # 式(7)
+    for i in range(0,9):
+      for j in range(0,9):
+        if puzzle[i][j] > 0:
+          equal(i, j, puzzle[i][j], f)
+  result = ! sat13 </tmp/s.sat 2>/tmp/err
+  ! cat /tmp/err
+  model = [ lit for lit in result[0].strip().split(" ") if not lit.startswith("~") ]
+  sol = [ [0] * 9 for i in range(9) ]
+  for [i,j,a] in [ lit.split(".") for lit in model ]:
+    sol[int(i)][int(j)] = int(a)
+  return sol
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+puzzle = [
+  [0,0,7,1,8,9,2,0,0],
+  [0,9,0,0,0,0,0,6,0],
+  [8,0,0,0,0,0,0,0,9],
+  [0,1,0,0,0,0,0,0,0],
+  [0,0,6,7,4,1,8,0,0],
+  [0,0,0,0,0,0,0,2,0],
+  [9,0,0,0,0,0,0,0,5],
+  [0,2,0,0,0,0,0,3,0],
+  [0,0,4,8,7,6,9,0,0]
+]
+sudoku_solver(puzzle)
+#+END_SRC
+
+* (補足) 有限オートマトン
+
+#+BEGIN_SRC ipython :session
+from graphviz import Digraph
+
+g = Digraph('NFA1')
+g.attr(rankdir='LR')
+g.node(' ', shape='plaintext')
+g.node('q0', shape='circle')
+g.node('q1', shape='doublecircle')
+g.edge(' ', 'q0')
+g.edge('q0', 'q0', label='0')
+g.edge('q0', 'q1', label='1')
+g.edge('q1', 'q1', label='0')
+g
+#+END_SRC
+
+遷移規則 ($i=0,1,\ldots,n-1$)
+- $(s_i=q_0 \land x_i=0) \Rightarrow (s_{i+1}=q_0)$
+- $(s_i=q_0 \land x_i=1) \Rightarrow (s_{i+1}=q_1)$
+- $(s_i=q_1 \land x_i=0) \Rightarrow (s_{i+1}=q_1)$
+- $(s_i=q_1 \land x_i=1) \Rightarrow 0$
+
+初期状態
+- $s_0=q_0$
+
+終了状態
+- $s_n=q_1$
+
+#+BEGIN_SRC ipython :session
+from graphviz import Digraph
+
+g = Digraph('NFA2')
+g.attr(rankdir='LR')
+g.node(' ', shape='plaintext')
+g.node('q0', shape='circle')
+g.node('q1', shape='circle')
+g.node('q2', shape='doublecircle')
+g.edge(' ', 'q0')
+g.edge('q0', 'q0', label='0')
+g.edge('q0', 'q1', label='1')
+g.edge('q1', 'q2', label='1')
+g.edge('q2', 'q2', label='0')
+g
+#+END_SRC
+
+遷移規則 ($i=0,1,\ldots,n-1$)
+- $(s_i=q_0 \land x_i=0) \Rightarrow (s_{i+1}=q_0)$
+- $(s_i=q_0 \land x_i=1) \Rightarrow (s_{i+1}=q_1)$
+- $(s_i=q_1 \land x_i=0) \Rightarrow 0$
+- $(s_i=q_1 \land x_i=1) \Rightarrow (s_{i+1}=q_2)$
+- $(s_i=q_2 \land x_i=0) \Rightarrow (s_{i+1}=q_2)$
+- $(s_i=q_2 \land x_i=1) \Rightarrow 0$
+
+初期状態
+- $s_0=q_0$
+
+終了状態
+- $s_n=q_2$
+
+#+BEGIN_SRC ipython :session
+import sys
+
+def p(k, i, j):
+  return f"p{k}.{i}.{j}"
+
+def nfa1(k, x, f=sys.stdout):
+  print(p(k,0,0), file=f)
+  print(p(k,len(x),1), file=f)
+  for i in range(len(x)):
+    print(f"~{p(k,i,0)} {x[i]} {p(k,i+1,0)}", file=f)
+    print(f"~{p(k,i,0)} ~{x[i]} {p(k,i+1,1)}", file=f)
+    print(f"~{p(k,i,1)} {x[i]} {p(k,i+1,1)}", file=f)
+    print(f"~{p(k,i,1)} ~{x[i]}", file=f)
+  for i in range(len(x)+1):
+    # p(k,i,0)+p(k,i,1)=1 の条件が必要
+    print(f"{p(k,i,0)} {p(k,i,1)}", file=f)
+    print(f"~{p(k,i,0)} ~{p(k,i,1)}", file=f)
+
+def nfa2(k, x, f=sys.stdout):
+  print(p(k,0,0), file=f)
+  print(p(k,len(x),2), file=f)
+  for i in range(len(x)):
+    print(f"~{p(k,i,0)} {x[i]} {p(k,i+1,0)}", file=f)
+    print(f"~{p(k,i,0)} ~{x[i]} {p(k,i+1,1)}", file=f)
+    print(f"~{p(k,i,1)} {x[i]}", file=f)
+    print(f"~{p(k,i,1)} ~{x[i]} {p(k,i+1,2)}", file=f)
+    print(f"~{p(k,i,2)} {x[i]} {p(k,i+1,2)}", file=f)
+    print(f"~{p(k,i,2)} ~{x[i]}", file=f)
+  for i in range(len(x)+1):
+    # p(k,i,0)+p(k,i,1)+p(k,i,2)=1 の条件が必要
+    print(f"{p(k,i,0)} {p(k,i,1)} {p(k,i,2)}", file=f)
+    print(f"~{p(k,i,0)} ~{p(k,i,1)}", file=f)
+    print(f"~{p(k,i,0)} ~{p(k,i,2)}", file=f)
+    print(f"~{p(k,i,1)} ~{p(k,i,2)}", file=f)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session
+with open("/tmp/n.sat", "w") as f:
+  nfa2(1, ["x0.0","x0.1","x0.2","x0.3"], f)
+  nfa1(2, ["x1.0","x1.1","x1.2","x1.3"], f)
+  nfa2(3, ["x2.0","x2.1","x2.2","x2.3"], f)
+  nfa1(4, ["x3.0","x3.1","x3.2","x3.3"], f)
+  nfa2(5, ["x0.0","x1.0","x2.0","x3.0"], f)
+  nfa1(6, ["x0.1","x1.1","x2.1","x3.1"], f)
+  nfa2(7, ["x0.2","x1.2","x2.2","x3.2"], f)
+  nfa1(8, ["x0.3","x1.3","x2.3","x3.3"], f)
+  # print("x0.0", file=f)
+! sat13 </tmp/n.sat | tr ' ' '\n' | grep x | sort
 #+END_SRC
 
