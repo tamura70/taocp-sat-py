@@ -66,7 +66,7 @@ cd /content/prog
 
 * 充足可能性
 
-教科書4ページの式(6) [[../prog/rivest-sat.sat][rivest-sat.sat]] に対してKnuth作のSATソルバー sat13 を実行してみる．
+教科書4ページの式(6) [[../prog/rivest-unsat.sat][rivest-unsat.sat]] に対してKnuth作のSATソルバー sat13 を実行してみる．
 #+BEGIN_SRC ipython :session
 ! sat13 < rivest-unsat.sat
 #+END_SRC
@@ -320,9 +320,10 @@ z2
 * (補足) 数独
 
 #+BEGIN_SRC ipython :session
+import sys
+
 def p(i, j, a):
   return f"{i}.{j}.{a}"
-import sys
 
 def cell(i, j, f=sys.stdout):
   # 式(4)
