@@ -3,6 +3,9 @@
 # install bash
 python -m bash_kernel.install
 
+# install graphviz
+pip install graphviz
+
 # move binaries
 mv $HOME/bin $HOME/.local
 chmod +x $HOME/.local/bin/*
